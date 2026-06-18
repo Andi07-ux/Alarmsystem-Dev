@@ -12,10 +12,10 @@ Dieses Repository enthält:
 - **Briefing-Material** (Aufgabenstellung, Hintergrundgeschichte, Vorfälle) → `01-quellen/`
 - **Erarbeitete Deliverables** (Requirements, Design, Projektplan) → `02-Arbeitsdokumente/`
 - **Backend-Code** (geplant) → `src/`, `tests/`
-- **Entscheidungslogbuch** (KI-Onboarding, Agenten-Briefe) → Root
+- **Entscheidungslogbuch** → `02-Arbeitsdokumente/Entscheidungslog-Lucas-Systemarchitektur.md` · **KI-Onboarding** → Root (`Agents-gpt-gemini.md`)
 
-**Remote:** GitHub-Org `Entwicklerteam-WI2-0` · **Branch:** `main` (geschützt)  
-**Lokaler Pfad (Team-Dev):** `C:\Users\LucasVöhringer\Desktop\Alarmsystem-Dev`
+**Remote:** GitHub-Org `Entwicklerteam-WI2-0` · **Branch:** `main` (PR-Workflow, kein direkter Push)  
+**Lokaler Pfad:** lokal je Entwickler:in (kein fixer Team-Pfad)
 
 > **🧰 Agenten-/Tooling-Setup wohnt jetzt getrennt:** Die kanonische Heimat der KI-Werkzeuge (Setup,
 > geteilte Agent-Config, Onboarding, Skill-Pläne) ist der **Vibecoding-Stack** `Devteam-vibecodes` —
@@ -38,7 +38,7 @@ Alarmsystem-Dev/
 │   ├── Usecase-quick.md                 # FA-01–12, NF-01–11, RB-01, AE-01/02, Konfliktanalyse K1–K9
 │   ├── Schwellenwerte.md                # Vereisungslogik + 4 Stufen (🟢🟡🟠🔴) + Kalibriervorgaben
 │   ├── Backend-Konzept.md               # Architektur G2, Module, Datenmodell, Tech-Stack-Optionen
-│   ├── Projektplan-Backend.md           # Phasen P0–P6, Meilensteine M1–M3, Kanban-Tasks
+│   ├── Tasks+Projektplan.md           # Phasen P0–P6, Meilensteine M1–M3, Kanban-Tasks
 │   ├── Team-Organisation+Regeln.md      # Rollen/DRI, Zusammenarbeits-Map, Teamregeln
 │   └── assets/                          # Bilder (Architekturskizzen, Rollen, Gruppen)
 │
@@ -76,7 +76,6 @@ Alarmsystem-Dev/
 ├── erinnerung/                          # Geteiltes Projektgedächtnis (/start liest es)
 │   ├── README.md
 │   └── stand.md
-├── setup.sh  /  setup.ps1               # Einmal-Setup (macOS / Windows)
 ├── pyproject.toml                       # uv-Umgebung (FastAPI, pytest, ruff)
 ├── claude-sync.md                       # Geteilte Agent-Config → wird lokal zu CLAUDE.md
 ├── ONBOARDING.md                        # 3-Schritt-Schnellstart
@@ -90,35 +89,19 @@ Alarmsystem-Dev/
 
 ---
 
-## ⚙️ Setup & Onboarding (in 3 Schritten)
+> **Hinweis zur Struktur:** `src/`, `tests/`, `config/` und `.github/` sind **geplant** (Zielzustand nach `Backend-Konzept §7`) und noch nicht im Repo.
 
-> Vom blanken Rechner zur fertig konfigurierten Agenten-Umgebung — **ohne** manuelles Gefummel.
-> Funktioniert auf **macOS** und **Windows**. Ausführlich: [`ONBOARDING.md`](ONBOARDING.md).
+## ⚙️ Setup & Tooling
 
-**1. Claude Code installieren** (einmalig) — offizielle CLI. Test: `claude --version`.
+> **Setup, Agenten-Config und Onboarding-Tooling leben getrennt im Vibecoding-Stack `Devteam-vibecodes`.**
+> Dieses Repo ist für **Produktcode + Pflichtdokumentation** — es enthält bewusst **keine** Setup-Skripte mehr.
 
-**2. Repo klonen**
+**Repo klonen & Code lauffähig machen** (sobald Backend-Code existiert):
 ```bash
 git clone https://github.com/Entwicklerteam-WI2-0/Alarmsystem-Dev.git
 cd Alarmsystem-Dev
+uv sync          # Python-Umgebung reproduzierbar aus pyproject.toml
 ```
-
-**3. Setup-Skript ausführen**
-```bash
-bash setup.sh                                        # macOS / Linux
-powershell -ExecutionPolicy Bypass -File setup.ps1   # Windows
-```
-Installiert `uv` (falls nötig), baut die Python-Umgebung (`uv sync`) und legt deine lokale `CLAUDE.md` aus `claude-sync.md` an.
-
-**Danach arbeiten:** Ordner in **VS Code** öffnen → im Terminal **`claude`** starten → einmal **„Projekt vertrauen"** → **`/start`** tippen (lädt Kontext, Stand & Regeln).
-
-### Was das Repo automatisch mitbringt
-- **Skills/Commands** (`/setup`, `/start`, …) und **Standard-Checks** (Hooks) — direkt aus `.claude/`, keine Einzelkonfiguration nötig.
-- **Identische Python-Umgebung** für alle via `uv` + `pyproject.toml`.
-- **Geteiltes Gedächtnis** in `erinnerung/` (wird von `/start` gelesen).
-- **Gemeinsame Regeln** in `claude-sync.md` → lokal als `CLAUDE.md`.
-
-> Gemeinsame Regeln immer in **`claude-sync.md`** ändern (per PR) — **nicht** in der lokalen `CLAUDE.md`, sonst driften die Stände auseinander.
 
 ---
 
@@ -157,7 +140,7 @@ Installiert `uv` (falls nötig), baut die Python-Umgebung (`uv sync`) und legt d
    │   Persistenz (DB: readings)              │
    └─────────────────────────────────────────┘
          ↓
-   ┌───────────────────────────────────��─────┐
+   ┌──────────────────────────────────────────┐
    │  Bewertungsmodul (4-Stufen-Logik)        │
    │  Input: T_s, T_d, RH, Niederschlag      │
    │  Output: risk_level (green/yellow/...)  │
@@ -226,7 +209,7 @@ Definiert in **`02-Arbeitsdokumente/Schwellenwerte.md §2`**:
 - Schnittstellen zu G1 (Sensorik) & G3 (Frontend)
 
 ### Projektplan & Kanban
-**Datei:** `02-Arbeitsdokumente/Projektplan-Backend.md`  
+**Datei:** `02-Arbeitsdokumente/Tasks+Projektplan.md`  
 **Inhalt:**
 - Phasen **P0–P6** (Setup → Contract → T0 Slice → T1 Kern → T2 Betrieb → Integration → T3 Erweiterung)
 - Meilensteine **M1–M3** (Wochenenden 1, 2, 3)
@@ -249,7 +232,7 @@ Definiert in **`02-Arbeitsdokumente/Schwellenwerte.md §2`**:
 
 | Komponente | Empfehlung | Alternativen |
 |---|---|---|
-| **Sprache** | Python 3.9+ | — |
+| **Sprache** | Python 3.11+ | — |
 | **Framework** | FastAPI | Flask, Node/Express |
 | **Validierung** | Pydantic v2 | — |
 | **Datenbank** | SQLite (T0) → PostgreSQL (T1+) | TimescaleDB |
@@ -275,17 +258,15 @@ cd Alarmsystem-Dev
 1. 02-Arbeitsdokumente/Backend-Konzept.md          # Was bauen wir?
 2. 02-Arbeitsdokumente/Schwellenwerte.md          # Wie entscheidet die Logik?
 3. 02-Arbeitsdokumente/Usecase-quick.md           # Welche Anforderungen?
-4. 02-Arbeitsdokumente/Projektplan-Backend.md    # Wer macht was bis wann?
+4. 02-Arbeitsdokumente/Tasks+Projektplan.md    # Wer macht was bis wann?
 5. 02-Arbeitsdokumente/Team-Organisation+Regeln.md # Wie arbeiten wir zusammen?
 ```
 
 ### 3. Umgebung aufsetzen
 ```bash
-# Einmal-Setup übernimmt alles (uv, Python-Umgebung, lokale CLAUDE.md):
-bash setup.sh                                        # macOS / Linux
-powershell -ExecutionPolicy Bypass -File setup.ps1   # Windows
+uv sync          # Python-Umgebung reproduzierbar aus pyproject.toml
 ```
-> Erstmaliges Onboarding: siehe **⚙️ Setup & Onboarding** oben. Manuell geht auch: `uv sync` (nutzt `pyproject.toml`).
+> Setup-/Agenten-Tooling lebt in `Devteam-vibecodes` (siehe **⚙️ Setup & Tooling** oben).
 
 ### 4. Server starten
 ```bash
@@ -331,7 +312,7 @@ Refs: FA-05, NF-01, Schwellenwerte.md
 ```
 
 ### Pull Requests
-1. **Titel:** `[Phase/Epic] Kurzbe schreibung`
+1. **Titel:** `[Phase/Epic] Kurzbeschreibung`
 2. **Description:** Was, warum, wie; Links zu Docs
 3. **Review:** Architekt (Lucas V.) bestätigt Contract
 4. **Tests:** mindestens grün vor Merge
@@ -400,7 +381,7 @@ tests/
 - **Wer + Wann:** Owner + Datum
 
 ### Wo dokumentieren?
-- **Technisch:** Root-Datei `Entscheidungslogbuch.md` (geplant) oder in PR-Beschreibungen
+- **Technisch:** `02-Arbeitsdokumente/Entscheidungslog-Lucas-Systemarchitektur.md` (existiert, lebendes Dokument) + PR-Beschreibungen
 - **Prozess:** Doku-Rolle (Maryam + Vladyslav) sammelt regelmäßig ein
 
 ---
@@ -428,7 +409,7 @@ tests/
 | **Systemarchitekt** | **Vöhringer, Lucas** + Petzold, Johannes | API, Datenmodell, Schnittstellen |
 | **Backend-Lead** | **Vöhringer, Lucas** | Code-Quality, Reviews, Backend-Koordination |
 | Backend-Devs | Hartling, Leon · Ganter, Luca · Moritz, Andreas · Sarkhab, Arash | Ingest, Persistenz, Bewertungslogik, API |
-| Test-Lead | Mohammadi, Azezoo | Definition of Done, Testprotokoll |
+| Test / Review | Mohammadi, Azezoo · Berger, Amelie | Definition of Done, Testprotokoll |
 | Dokumentation | Reisi, Maryam + Ilchyshyn, Vladyslav | Entscheidungslogbuch, API-Doku |
 
 **Fragen zur Architektur?** → Lucas V.  
@@ -466,4 +447,4 @@ tests/
 
 **Viel Erfolg bei der Implementierung!** 🚀
 
-*Letzte Aktualisierung: 17.06.2026 — G2 Backend & Entscheidungslogik*
+*Letzte Aktualisierung: 18.06.2026 — G2 Backend & Entscheidungslogik*
