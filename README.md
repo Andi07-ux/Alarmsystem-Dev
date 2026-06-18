@@ -17,6 +17,11 @@ Dieses Repository enthält:
 **Remote:** GitHub-Org `Entwicklerteam-WI2-0` · **Branch:** `main` (geschützt)  
 **Lokaler Pfad (Team-Dev):** `C:\Users\LucasVöhringer\Desktop\Alarmsystem-Dev`
 
+> **🧰 Agenten-/Tooling-Setup wohnt jetzt getrennt:** Die kanonische Heimat der KI-Werkzeuge (Setup,
+> geteilte Agent-Config, Onboarding, Skill-Pläne) ist der **Vibecoding-Stack** `Devteam-vibecodes` —
+> *dort* wird das Werkzeug gepflegt, mit dem *hier* gebaut wird. Dieses Repo ist für **Produktcode +
+> Pflichtdokumentation**. Noch vorhandene Setup-/Agenten-Dateien im Root sind eine Übergangs-Redundanz.
+
 ---
 
 ## 🏗️ Repo-Struktur
