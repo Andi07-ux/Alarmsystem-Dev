@@ -74,7 +74,7 @@ Repo `Alarmsystem-Dev` (Remote `Entwicklerteam-WI2-0/Alarmsystem-Dev`, Branch `m
 | `01-quellen/Zeitplan.txt` | Wochenplanung (Analyse/Anforderungen, Entwicklung/Prototyping) |
 | `01-quellen/Prüfungsleistung Anforderungen.txt` | Bewertungskriterien (40 % individuell / 60 % Gruppe) + Pflichtdokumente |
 | `02-Arbeitsdokumente/Usecase-quick.md` | Usecase + Anforderungen (FA, NF, RB-01, AE, Konflikte K1–K9) |
-| `02-Arbeitsdokumente/Schwellenwerte.md` | **Vereisungslogik + konkrete Schwellenwerte** (4 Stufen) + Kalibriervorgaben je FA/NFA |
+| `02-Arbeitsdokumente/Schwellenwerte.md` | **Vereisungslogik + konkrete Schwellenwerte** (4 Stufen) + Kalibriervorgaben je FA/NFA — ⚠️ **DUMMY-WERTE, s. u.** |
 | `02-Arbeitsdokumente/Backend-Konzept.md` | Architektur der Backend-Gruppe: Module, Datenmodell, Tech-Stack-Optionen, Code-Struktur |
 | `02-Arbeitsdokumente/Tasks+Projektplan.md` | Phasen P0–P6, Meilensteine M1–M3, Kanban-Tasks (Owner/DoD/Größe) |
 | `02-Arbeitsdokumente/Team-Organisation+Regeln.md` | Rollen/DRI, Zusammenarbeits-Map, Teamregeln |
@@ -87,6 +87,24 @@ Repo `Alarmsystem-Dev` (Remote `Entwicklerteam-WI2-0/Alarmsystem-Dev`, Branch `m
 > Frühere Dateien sind abgelöst/umbenannt: *Stakeholderanalyse* → *Nutzer-und-Stakeholdermodel*;
 > *Randbedingungsmetriken* → *Schwellenwerte*; *Architektur-Stack-Konzept* (zu breit) → *Backend-Konzept* (G2-scoped).
 > Ursprüngliche PDFs liegen nicht mehr vor; maßgeblich sind die `.txt`-Extrakte.
+
+> [!WARNING]
+> **DUMMY-SCHWELLENWERTE — Nachlieferung durch G1 ausstehend**
+>
+> Die in `Schwellenwerte.md` eingetragenen numerischen Grenzwerte (Temperaturen, Taupunkt-Abstände,
+> Feuchte-Grenzen usw.) sind **vorläufige Platzhalterwerte**, die auf Basis der Hintergrundgeschichte
+> eigenständig abgeschätzt wurden. Sie wurden **nicht messtechnisch validiert** und sind **nicht
+> abgestimmt** mit Gruppe 1 (Sensorik & Daten).
+>
+> **Was noch aussteht:** Gruppe 1 liefert die echten, sensorspezifisch kalibrierten Schwellenwerte
+> nach. Diese ersetzen die Dummies vollständig.
+>
+> **Konsequenz für Feature-Entwicklung (PFLICHT):**
+> - Schwellenwerte dürfen **niemals hardgecoded** werden.
+> - Alle Grenzwerte **ausnahmslos** über `config/` parametrierbar halten.
+> - Code, Tests und Konfigurationen müssen den **Austausch durch G1-Finalwerte ohne Refactoring** ermöglichen.
+> - Bis zur Finallieferung von G1: Dummies nur als **Testfixtures/Entwicklungsstände** behandeln,
+>   nicht als fachlich korrekte Werte.
 
 ### Heutiger Stand (16.06.2026)
 
@@ -179,6 +197,8 @@ Zentrale Schnittstelle aller Gruppen = **API/Datenmodell der Gruppe 2**, bis End
 - **Hybride Methodik:** G1/G2 Wasserfall, G3 Scrum; Schnittstellen früh definieren.
 - **Sicherheitskritikalität:** jede Entscheidung gegen Fehlalarme/nicht erkannte Vereisung abwägen.
 - **Vereisungslogik/Schwellenwerte ausschließlich aus `Schwellenwerte.md`** — nichts dazuerfinden; Defaults parametrierbar.
+  **⚠️ Schwellen in `Schwellenwerte.md` sind DUMMIES** — finale Werte kommen von G1 (Sensorik), noch ausstehend.
+  Beim Feature-Bau: **keine Hardcodierung**, alle Schwellen über `config/` austauschbar halten.
 - Funktionale Vorgehensweise: **vom Kernpfad (T0) ausgehen**, Features als T1–T3 aufsetzen (s. `Backend-Konzept.md` / `Tasks+Projektplan.md`).
 - Abweichungen vom Plan als **[DEVIATION]** markieren und begründen.
 
@@ -224,6 +244,10 @@ UI-/Alarm-/Integrationskonzept (G3), Entscheidungslogbuch (laufend), Testprotoko
 - **Anforderungs-/Konzeptdokumente beachten:** `Usecase-quick.md`, `Schwellenwerte.md`, `Backend-Konzept.md`,
   `Tasks+Projektplan.md`, `teamstruktur-final.md` (gemeinsame IDs FA/NF/RB/AE/K, Tasks P#.#).
 - **Belegbasiert arbeiten:** keine erfundenen Schwellenwerte/Quellen; Unsicheres kennzeichnen; bei Bedarf nachfragen.
+- **⚠️ DUMMY-SCHWELLEN beachten:** Alle Zahlenwerte in `Schwellenwerte.md` sind aktuell **Platzhalterwerte**.
+  Die verbindlichen Grenzwerte werden noch von **Gruppe 1 (Sensorik & Daten)** nachgeliefert.
+  Beim Implementieren von Features und Tests gilt: **Schwellen nie hardcoden — immer über `config/`
+  parametrierbar**, damit G1-Finalwerte ohne Code-Änderungen einspielbar sind.
 - **Session-Recap:** Claude Code → `/ck:resume`; Kimi → aktuellste `recap_YYYY-MM-DD.md` unter `C:\Users\LucasVöhringer\.kimi\.recap\`.
 - **Deutsch verwenden.** Sicherheitskritisches Ingenieursprojekt, kein normales Webprojekt.
 - Abweichungen als **[DEVIATION]** markieren und begründen.

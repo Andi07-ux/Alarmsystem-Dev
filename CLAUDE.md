@@ -43,6 +43,12 @@ Vor `push`/PR/`force-push`/destruktiven Git-Aktionen: **vorher Genehmigung einho
 - `Usecase-quick.md` — Anforderungen: funktional **FA-01–12**, nicht-funktional **NF-01–11**, harte Randbedingung
   **RB-01**, offene Entscheidungen **AE-01/AE-02**, Konfliktanalyse **K1–K9** (§4)
 - `Schwellenwerte.md` — **Vereisungslogik + konkrete Schwellenwerte** (4 Stufen 🟢🟡🟠🔴) und Kalibriervorgaben je FA/NFA
+  > ⚠️ **DUMMY-WERTE:** Die aktuell eingetragenen Schwellen sind **vorläufige Platzhalterwerte**,
+  > die eigenständig abgeschätzt wurden. Die **verbindlichen, messtechnisch validierten Schwellenwerte**
+  > werden noch von **Gruppe 1 (Sensorik & Daten)** nachgeliefert und ersetzen diese Dummies vollständig.
+  > **Beim Bau von Features, Tests und Konfigurationen darf KEINE harte Verdrahtung dieser Dummies
+  > erfolgen — alle Schwellen müssen parametrierbar bleiben (→ `config/`), damit der Austausch
+  > durch die G1-Finalwerte ohne Code-Änderung möglich ist.**
 - `Backend-Konzept.md` — **Architektur der Backend-Gruppe** (Module, Datenmodell, Tech-Stack-Optionen, Code-Struktur)
 - `Tasks+Projektplan.md` — Phasen **P0–P6**, Meilensteine M1–M3, Kanban-Tasks (Owner/DoD/Größe)
 - `Team-Organisation+Regeln.md` — Rollen/DRI, Zusammenarbeits-Map, Teamregeln
@@ -145,3 +151,7 @@ Anforderungen, technische Umsetzung, Teamorganisation, Reflexion.
   begründet ins Entscheidungslogbuch (Optionen in `Backend-Konzept.md` §6; Empfehlung T0: FastAPI + SQLite + HTTP).
 - Funktionale Vorgehensweise: **vom Kernpfad (T0) ausgehen**, Features als T1–T3 aufsetzen (s. `Backend-Konzept.md` / `Tasks+Projektplan.md`).
 - **Vereisungslogik/Schwellenwerte** ausschließlich aus `Schwellenwerte.md` — nichts dazuerfinden; Defaults parametrierbar.
+  > ⚠️ **ACHTUNG DUMMY-SCHWELLEN:** Die Werte in `Schwellenwerte.md` sind aktuell **Platzhalterwerte (Dummies)**.
+  > Finale, messtechnisch validierte Schwellen kommen von **Gruppe 1 (Sensorik)** — noch ausstehend.
+  > **Pflicht beim Feature-Bau:** Schwellen NIE hardcoden; ausnahmslos über `config/` parametrierbar
+  > halten, damit der Austausch durch G1-Finalwerte ohne Refactoring möglich ist.
