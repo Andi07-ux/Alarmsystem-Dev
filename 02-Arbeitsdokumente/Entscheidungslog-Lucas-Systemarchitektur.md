@@ -100,6 +100,14 @@
 - *Ergebnis/Status:* **G2-Seite des Contracts festgelegt (23.06.2026).** **Offen (DoD DTB-26):** schriftliche Bestätigung der Feldnamen/Formate durch **G1-Lead** und **G3-Lead** (E-Mail oder GitHub-Issue mit Label `seam-sync-confirmed`) — erst danach gilt der Contract als beidseitig eingefroren. `humidity_pct` = Luftfeuchte (von G1 zu bestätigen).
 - *Bezug:* schließt **DTB-26 (P1.3)** ab, friert **P1.4** ein; baut auf **E-31**; AE-03 (neu, ersetzt offenen AE-Platzhalter); NF-02 (Finalwerte); FA-13; `src/model/schemas.py` (Reading/Assessment); `Umstellung-Pull-3Faktor-Faktenblatt.md`; DTB-19 (OpenAPI), DTB-28 (Persistenz), DTB-38 (Bewertungskern).
 
+**E-37 — Alarm-Auslieferung an G3: Push via SSE (Event), `GET /v1/alarms` nur als Zustands-Resync — kein Poll-Scan**
+- *Kontext/Task:* Folgeentscheidung zum Contract (**E-36**, DTB-35) · G2→G3-Naht · FA-Alarmierung · NF-01 (Fail-safe) · RB-01. *Auslöser:* Architektur-Review (Lucas) — Alarme sind globale System-**Events**; sie per Polling „abzuscannen" ist semantisch falsch und verzögert sicherheitskritische Meldungen.
+- *Entscheidung:* Alarme werden als **Events gepusht**, nicht gepollt. **`GET /v1/alarms/stream`** als **Server-Sent-Events**-Endpoint: G3 hält **eine** Dauerverbindung, G2 pusht neue Alarme sofort. **`GET /v1/alarms`** bleibt — **nicht** als Entdeckungs-/Poll-Mechanismus, sondern als **Zustands-Abfrage** (aktiv beim Laden + Resync nach Verbindungsabriss). G2 bleibt **Server** (G3 hostet nichts); `ack` reine Audit-Aktion (RB-01).
+- *Begründung:* Events gehören gepusht; Polling nach Alarmen ist verschwenderisch und latenzbehaftet. SSE liefert echten Push, ohne dass G3 einen Endpoint hostet (G3 abonniert *unseren* Stream → wir bleiben Server). Für ein **Sicherheitssystem** ist reiner Push allein fragil (Event-Verlust bei Disconnect → übersehener Alarm), daher der **`GET /v1/alarms`-Zustands-Backstop** für Initial-Load und Resync. So sind Sofort-Meldung **und** Robustheit erfüllt.
+- *Alternativen (verworfen):* **Reines Polling `GET /alarms`** (bisheriger Doku-Stand) — semantisch falsch für Events, latenzbehaftet. **Echtes Push per Webhook (G2 ruft G3)** — verlangt, dass G3 einen Endpoint hostet, widerspricht „G2 = Server". **WebSocket** — für unidirektionale Alarme Overkill; SSE genügt.
+- *Konsequenz/offen:* SSE-Implementierung ist **T2** (FastAPI `StreamingResponse` / `sse-starlette`); `GET /v1/alarms` (Zustand) kann früher stehen. Doku nachgezogen: Backend-Konzept §9.2, README (Datenfluss), Source-README, `API_FROZEN_v1.md`, `Team-Sync-Entscheidungen.md`.
+- *Bezug:* ergänzt **E-36**; FA-Alarmierung; NF-01; RB-01; **DTB-19** (OpenAPI muss `/v1/alarms/stream` + `/v1/alarms` führen), DTB-35.
+
 ## C. Vereisungs-Entscheidungslogik & Schwellenwerte
 
 **E-10 — Bewertung über Oberflächentemperatur + Taupunkt-Abstand + Feuchte (+ Niederschlag, am 22.06.2026 gestrichen → E-32); Lufttemperatur nur Kontext**

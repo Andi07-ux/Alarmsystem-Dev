@@ -52,6 +52,8 @@ G2 ist an dieser Naht **Client**: G2 pollt G1, G1 liefert nur Rohwerte.
 ```
 
   → G3 bekommt die **Ampel + die Roh-Messwerte** im selben Response (deckt Frage 1 ab).
+- **Alarme = Push, kein Poll (E-37):** `GET /v1/alarms/stream` (SSE — G2 pusht Alarm-Events live) +
+  `GET /v1/alarms` (Zustands-Abfrage/Resync, Sicherheits-Backstop). `POST /v1/alarms/{id}/ack` = reine Audit-Aktion (RB-01).
 
 ### Offene G3-Punkte (warten auf G3-Antwort, aus Luca Ganters Fragenkatalog DTB-26)
 

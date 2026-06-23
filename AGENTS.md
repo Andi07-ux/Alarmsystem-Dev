@@ -167,7 +167,7 @@ Der konkrete Stack ist **noch nicht final** und gehört begründet ins Entscheid
 Optionen + Empfehlung in **`Backend-Konzept.md` §6**:
 
 - **Backend:** Python **FastAPI** (Empfehlung) · Flask · Node/Express
-- **Datenbank:** **MySQL 8 / MariaDB** (GL-Vorgabe, durchgängig ab T0; dev = prod via Docker-Compose, → E-29)
+- **Datenbank:** **MySQL 8 / MariaDB** (GL-Vorgabe, durchgängig ab T0; native MariaDB, kein Docker, rohes PyMySQL statt ORM → E-29/E-35)
 - **Datenabruf:** **HTTP-Pull** — G2 pollt G1s `GET /current` (Snapshot + `measured_at`) + `GET /health`, Intervall ≤ 60 s selbst bestimmt (→ E-31) → MQTT (Skalierung)
 - **Sensorik (G1, Kontext):** ESP32/Raspberry Pi; IR-/Kontaktsensor Oberflächentemp; Kombisensor Temp/Feuchte/Druck (BME280/SHT31); Eisindikator zunächst Proxy/Sim.
 

@@ -117,3 +117,21 @@
 - **main aktuell:** 57a2c5d "Add API contract FROZEN v1 (draft) (#44)".
 - **Neu offen:** Jira-Status DTB-1/DTB-51 aktualisieren; DTB-53/54/55/56 (DB-Setup) angehen; DTB-35
   Contract an G1/G3 kommunizieren; Jira-Link 10011 löschen.
+
+## Update [23.06., ~14:30] — Alarm-Push (E-37) + Doku-Drift-Fix (SQLAlchemy/Docker→E-35, `/v1/`) (architekt)
+- **E-37 — Alarme = Push via SSE** (`GET /v1/alarms/stream`); `GET /v1/alarms` nur Zustands-Resync, **kein
+  Poll-Scan**. Alarme sind Events → Polling semantisch falsch/latenzbehaftet; SSE = Push ohne dass G3 etwas
+  hostet; `GET /alarms` als Sicherheits-Backstop (Disconnect-Resync). SSE-Impl = T2. Doku nachgezogen
+  (Backend-Konzept §9.2, READMEs, `API_FROZEN_v1.md`, `Team-Sync-Entscheidungen.md`).
+- **Doku-Drift bereinigt (E-35/E-36/AE-03):** Backend-Konzept §4/§6/§6a/§7/§9 + Root-README + AGENTS auf
+  **rohes PyMySQL / native MariaDB / kein Docker / kein Alembic** + **`/v1/`**-Endpoints korrigiert (waren noch
+  SQLAlchemy/Docker bzw. ohne Versionspräfix). `claude-sync.md` (geteilte Agent-Config) auf E-35-Stand.
+- **Architektur-Klarstellung:** G2 = **Server** zu G3 (G3 konsumiert per GET; Alarme via SSE-Push),
+  G2 = **Client** zu G1 (pollt `GET /current`). Grundstruktur war in den Docs **bereits korrekt** — Drift
+  betraf nur Stack-Prosa + fehlendes `/v1/`.
+- **⚠️ Parallel-Arbeit erkannt:** `API_FROZEN_v1.md` ist bereits via **#44 (57a2c5d)** auf `main` (DTB-35-Draft).
+  Lokaler Branch `feat/dtb-35-contract-freeze-v1` enthält daher eine **Dublette** + zusätzlich die Drift-Fixes/E-37
+  — **vor Push gegen aktuelles `main` (57a2c5d) rebasen/abgleichen**, sonst Konflikt/Doppelung. **Nichts gepusht.**
+- **Offen/weiter:** Branch rebasen + Dublette auflösen; Drift-Fixes + E-37 als PR; `docker-compose.yml` physisch
+  entfernen (E-35); DTB-19 `openapi.yaml` (Luca) muss `/v1/alarms/stream` + `/v1/alarms` führen; Tag `api-v1.0`
+  erst nach G1/G3-Sign-off.

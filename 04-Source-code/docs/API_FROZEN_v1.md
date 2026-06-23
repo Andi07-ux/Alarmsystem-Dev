@@ -65,9 +65,14 @@ G2 ist hier **Client**. G1 stellt bereit, G2 pollt.
 - **Fehler/Sonderfälle:** `400` bei ungültiger Anfrage; bei überalterten/fehlenden Daten **kein Fehler**,
   sondern `risk_level=unknown` + `is_stale=true` (Fail-safe, NF-01). (Detail-Codes in `openapi.yaml`, DTB-19.)
 
-### Spätere Endpoints (Platz im Vertrag reserviert, T1/T2)
-`GET /v1/alarms`, `GET /v1/readings`, `POST /v1/alarms/{id}/ack`. **`ack` ist reine UI-/Audit-Aktion,
-kein Bahn-Freigabe-Aktor** (RB-01). Verbindliche Form folgt mit `openapi.yaml`.
+### Alarme — Push via SSE, kein Poll-Scan (E-37)
+- **`GET /v1/alarms/stream`** (Server-Sent Events): G3 hält **eine** Verbindung, G2 **pusht** Alarme live.
+- **`GET /v1/alarms`**: Zustands-Abfrage aktiver Alarme (Initial-Load + Resync nach Disconnect —
+  Sicherheits-Backstop, **kein** Entdeckungs-Poll).
+- **`POST /v1/alarms/{id}/ack`**: Quittierung — reine UI-/Audit-Aktion, **kein** Bahn-Aktor (RB-01).
+
+### Weitere Endpoints (reserviert, T1/T2)
+`GET /v1/readings` (Historie). Verbindliche Form folgt mit `openapi.yaml` (DTB-19).
 
 ## 4. Messintervall + Stale (NF-02, final)
 
