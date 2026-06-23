@@ -4,9 +4,10 @@ Der Poller bleibt DB-agnostisch und arbeitet gegen das Repository-Interface
 aus src/storage/repository.py (Implementierung kommt in DTB-28).
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import Mock, patch
 
+import httpx
 import pytest
 
 from src.ingest.poller import Poller
@@ -62,6 +63,170 @@ def test_poll_valid_snapshot_saves_reading(poller: Poller, fake_repo: FakeReposi
     # Assert
     assert reading is not None
     assert reading.sensor_id == "anr-rwy-01"
-    assert reading.measured_at == datetime(2026, 6, 23, 10, 0, 0, tzinfo=timezone.utc)
+    assert reading.measured_at == datetime(2026, 6, 23, 10, 0, 0, tzinfo=UTC)
     assert len(fake_repo.readings) == 1
     assert fake_repo.readings[0].sensor_id == "anr-rwy-01"
+
+
+def test_poll_missing_required_field_does_not_save(
+    poller: Poller, fake_repo: FakeRepository, caplog
+) -> None:
+    snapshot = {
+        "measured_at": "2026-06-23T10:00:00Z",
+        "sensor_id": "anr-rwy-01",
+        # surface_temp_c fehlt
+        "air_temp_c": 1.2,
+        "humidity_pct": 96,
+    }
+
+    with patch("src.ingest.poller.httpx.get") as mock_get:
+        mock_get.return_value = _ok_response(snapshot)
+        reading = poller.poll()
+
+    assert reading is None
+    assert len(fake_repo.readings) == 0
+    assert "Pflichtfeld" in caplog.text
+
+
+def test_poll_out_of_range_temperature_does_not_save(
+    poller: Poller, fake_repo: FakeRepository, caplog
+) -> None:
+    snapshot = {
+        "measured_at": "2026-06-23T10:00:00Z",
+        "sensor_id": "anr-rwy-01",
+        "surface_temp_c": 100.0,
+        "air_temp_c": 1.2,
+        "humidity_pct": 96,
+    }
+
+    with patch("src.ingest.poller.httpx.get") as mock_get:
+        mock_get.return_value = _ok_response(snapshot)
+        reading = poller.poll()
+
+    assert reading is None
+    assert len(fake_repo.readings) == 0
+    assert "ausserhalb" in caplog.text
+
+
+def test_poll_out_of_range_humidity_does_not_save(
+    poller: Poller, fake_repo: FakeRepository, caplog
+) -> None:
+    snapshot = {
+        "measured_at": "2026-06-23T10:00:00Z",
+        "sensor_id": "anr-rwy-01",
+        "surface_temp_c": -0.4,
+        "air_temp_c": 1.2,
+        "humidity_pct": 101,
+    }
+
+    with patch("src.ingest.poller.httpx.get") as mock_get:
+        mock_get.return_value = _ok_response(snapshot)
+        reading = poller.poll()
+
+    assert reading is None
+    assert len(fake_repo.readings) == 0
+    assert "humidity_pct" in caplog.text
+
+
+def test_poll_http_error_does_not_save(poller: Poller, fake_repo: FakeRepository, caplog) -> None:
+    with patch("src.ingest.poller.httpx.get") as mock_get:
+        mock_get.side_effect = httpx.HTTPError("Verbindungsfehler")
+        reading = poller.poll()
+
+    assert reading is None
+    assert len(fake_repo.readings) == 0
+    assert "fehlgeschlagen" in caplog.text
+
+
+def test_poll_invalid_status_does_not_save(
+    poller: Poller, fake_repo: FakeRepository, caplog
+) -> None:
+    snapshot = {
+        "measured_at": "2026-06-23T10:00:00Z",
+        "sensor_id": "anr-rwy-01",
+        "surface_temp_c": -0.4,
+        "air_temp_c": 1.2,
+        "humidity_pct": 96,
+        "status": "broken",
+    }
+
+    with patch("src.ingest.poller.httpx.get") as mock_get:
+        mock_get.return_value = _ok_response(snapshot)
+        reading = poller.poll()
+
+    assert reading is None
+    assert len(fake_repo.readings) == 0
+    assert "status" in caplog.text
+
+
+def test_poll_non_object_payload_does_not_save(
+    poller: Poller, fake_repo: FakeRepository, caplog
+) -> None:
+    with patch("src.ingest.poller.httpx.get") as mock_get:
+        mock_get.return_value = _ok_response([1, 2, 3])
+        reading = poller.poll()
+
+    assert reading is None
+    assert len(fake_repo.readings) == 0
+    assert "kein JSON-Objekt" in caplog.text
+
+
+def test_poll_invalid_measured_at_does_not_save(
+    poller: Poller, fake_repo: FakeRepository, caplog
+) -> None:
+    snapshot = {
+        "measured_at": "kein-datum",
+        "sensor_id": "anr-rwy-01",
+        "surface_temp_c": -0.4,
+        "air_temp_c": 1.2,
+        "humidity_pct": 96,
+    }
+
+    with patch("src.ingest.poller.httpx.get") as mock_get:
+        mock_get.return_value = _ok_response(snapshot)
+        reading = poller.poll()
+
+    assert reading is None
+    assert len(fake_repo.readings) == 0
+    assert "G1-Feld ungueltig" in caplog.text
+
+
+def test_poll_empty_sensor_id_does_not_save(
+    poller: Poller, fake_repo: FakeRepository, caplog
+) -> None:
+    snapshot = {
+        "measured_at": "2026-06-23T10:00:00Z",
+        "sensor_id": "   ",
+        "surface_temp_c": -0.4,
+        "air_temp_c": 1.2,
+        "humidity_pct": 96,
+    }
+
+    with patch("src.ingest.poller.httpx.get") as mock_get:
+        mock_get.return_value = _ok_response(snapshot)
+        reading = poller.poll()
+
+    assert reading is None
+    assert len(fake_repo.readings) == 0
+    assert "sensor_id" in caplog.text
+
+
+def test_poll_pressure_out_of_range_does_not_save(
+    poller: Poller, fake_repo: FakeRepository, caplog
+) -> None:
+    snapshot = {
+        "measured_at": "2026-06-23T10:00:00Z",
+        "sensor_id": "anr-rwy-01",
+        "surface_temp_c": -0.4,
+        "air_temp_c": 1.2,
+        "humidity_pct": 96,
+        "pressure_hpa": 2000,
+    }
+
+    with patch("src.ingest.poller.httpx.get") as mock_get:
+        mock_get.return_value = _ok_response(snapshot)
+        reading = poller.poll()
+
+    assert reading is None
+    assert len(fake_repo.readings) == 0
+    assert "pressure_hpa" in caplog.text
