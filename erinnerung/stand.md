@@ -74,6 +74,20 @@
   (nicht vom Architekt) — Ablage/Commit klären. (3) Hysterese-Begriff „untere Schwelle" in §2 präzisieren;
   `assess_ice_risk`-Signatur (RH redundant, da nur `T_d`-Input).
 
+## Update [23.06., ~12:10] — DTB-15 Config-Loader fertig + PR offen (architekt/Petzold)
+- **DTB-15 (Config-Infrastructure) umgesetzt** (`feat/config-thresholds-loader`, Commit b1a60ae):
+  `04-Source-code/config/thresholds.json` (vereisung-Kaskade + Prognoseschwelle, DUMMY-Werte §2, DB-frei) +
+  `src/config/loader.py` (`load_thresholds()` → typisiertes `frozen` `Thresholds`, validiert Struktur+Werte,
+  fail-loud `ConfigError`) + `tests/test_config_loading.py` (**12 Tests, 100 % Line+Branch-Coverage**, ruff sauber).
+  **Enabler für DTB-38.**
+- **Scope bewusst begrenzt:** nur echte Schwellen; `taupunkt_magnus`/`hysterese`/`datenstatus`/Prognosehorizont
+  **nicht** aufgenommen (gehören zu DTB-32/-27/-18/-33, in Jira **unzugewiesen**; Magnus = physikal. Konstanten).
+- **PR gegen `main` offen** (Branch gepusht; Review Arezo/Amelie, Merge Lucas). Selbstreview WP5
+  (quality-gate/python-review/test-coverage) durch. 3 Einträge im persönlichen `Petzold-Entscheidungslog`.
+- **Neu offen:** (1) **DTB-11-Unstimmigkeit** in `04-Source-code/requirements.txt`: `sqlalchemy`/`alembic`
+  vs. E-35-Vorgabe „PyMySQL, kein SQLAlchemy" → Klärung mit Lucas vor PR-#18-Merge (Jira-Kommentar an DTB-11
+  gesetzt). (2) vorbestehender ruff-Fehler `src/ingest/__init__.py:1` (E501, Scaffolding-Code).
+
 ## Update [23.06., ~12:15] — Stack-Pivot E-35 (PyMySQL, kein Docker) + DTB-12 Datenmodell (architekt)
 - **E-35 (revidiert E-29-Umsetzung; DB-Mandat MySQL/MariaDB bleibt):** **kein SQLAlchemy** → rohes PyMySQL
   hinter Repository-Pattern (parametrisierte Queries Pflicht); **kein Alembic** → handgeschriebenes
